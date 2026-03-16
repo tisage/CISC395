@@ -1,0 +1,19 @@
+task_id,task_name,assigned_to,due_date,status,priority
+T001,Set up development environment,Alex,2026-03-02,Done,High
+T002,Review project requirements doc,Sam,2026-03-02,Done,High
+T003,Create database schema,Alex,2026-03-05,Done,Medium
+T004,Write API endpoints,Jordan,2026-03-05,In Progress,High
+T005,Design UI mockups,Sam,2026-03-06,Done,Medium
+T006,Set up CI/CD pipeline,Alex,2026-03-07,Blocked,High
+T007,Write unit tests,Jordan,2026-03-07,In Progress,Medium
+T008,Deploy to staging environment,Sam,2026-03-08,Blocked,High
+T009,Client presentation prep,Alex,2026-03-10,In Progress,High
+T010,Update README documentation,Jordan,2026-03-10,Done,Low
+T011,Code review session,Sam,2026-03-11,In Progress,Medium
+T012,Fix login bug,Alex,2026-03-11,Blocked,High
+T013,Optimize database queries,Jordan,2026-03-12,Pending,Medium
+T014,Add error handling,Sam,2026-03-12,Pending,Low
+T015,Final testing,Alex,2026-03-14,Pending,High
+T016,Prepare deployment checklist,Jordan,2026-03-14,Pending,Medium
+T017,User acceptance testing,Sam,2026-03-15,Pending,High
+T018,Write release notes,Alex,2026-03-15,Pending,Low
