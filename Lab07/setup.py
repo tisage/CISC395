@@ -93,11 +93,11 @@ def setup():
 
     print("Done! Your project is at: trip_notes/")
     print()
-    print("Next steps:")
+    print("Next steps (both terminals):")
     print("  cd trip_notes")
-    print("  Open VS Code with two terminals (Terminal 1: AI, Terminal 2: run/test)")
     print("  Terminal 2: python tests/test_flow.py   (expect import errors — normal)")
-    print("  Terminal 1: Please read and follow the instructions in @prompts/Lab07_Ex02_models.md")
+    print("  Terminal 1: launch your AI, then type:")
+    print("    Please read and follow the instructions in @prompts/Lab07_Ex02_models.md")
 
 
 def refresh():
