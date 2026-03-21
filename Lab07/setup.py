@@ -1,46 +1,62 @@
 """
 Lab 07: Trip Notes — Project Setup
-===================================
-Run this script ONCE from your CISC395 workspace folder to create the
+=====================================
+Run this script from your CISC395 workspace root to create the
 trip_notes/ project and download all required files.
 
-Usage:
+Usage (from CISC395/ root):
+    python Labs/Lab07/setup.py
+
+OR download and run from CISC395/ root:
+    curl -o setup.py https://raw.githubusercontent.com/tisage/CISC395/refs/heads/main/Lab07/setup.py
     python setup.py
 """
 
 import os
+import sys
 import urllib.request
 
 BASE_URL = "https://raw.githubusercontent.com/tisage/CISC395/refs/heads/main/Lab07/"
 
-# Files to download: (remote path, local path inside trip_notes/)
+# Files to download into trip_notes/
 DOWNLOADS = [
-    ("tests/test_flow.py",          "tests/test_flow.py"),
-    ("prompts/ex2_models.md",       "prompts/ex2_models.md"),
-    ("prompts/ex3_storage.md",      "prompts/ex3_storage.md"),
-    ("prompts/ex4_main.md",         "prompts/ex4_main.md"),
-    ("prompts/part2_template_a.md", "prompts/part2_template_a.md"),
-    ("prompts/part2_template_b.md", "prompts/part2_template_b.md"),
-    ("prompts/part2_template_c.md", "prompts/part2_template_c.md"),
+    ("tests/test_flow.py",              "tests/test_flow.py"),
+    ("prompts/Lab07_Ex02_models.md",    "prompts/Lab07_Ex02_models.md"),
+    ("prompts/Lab07_Ex03_storage.md",   "prompts/Lab07_Ex03_storage.md"),
+    ("prompts/Lab07_Ex04_main.md",      "prompts/Lab07_Ex04_main.md"),
+    ("prompts/Lab07_P2A_visited.md",    "prompts/Lab07_P2A_visited.md"),
+    ("prompts/Lab07_P2B_stats.md",      "prompts/Lab07_P2B_stats.md"),
+    ("prompts/Lab07_P2C_rating.md",     "prompts/Lab07_P2C_rating.md"),
 ]
 
-# Empty source files to create
-EMPTY_SRC = [
-    "src/main.py",
-    "src/models.py",
-    "src/storage.py",
-]
+EMPTY_SRC = ["src/main.py", "src/models.py", "src/storage.py"]
+
+
+def check_location():
+    """Warn if this looks like it is being run from inside Labs/Lab07/ instead of CISC395/."""
+    cwd = os.getcwd()
+    if os.path.basename(cwd) in ("Lab07", "Labs"):
+        print("WARNING: It looks like you are running this from inside the Labs/ folder.")
+        print(f"  Current directory: {cwd}")
+        print("  Please run from your CISC395 workspace root instead:")
+        print("  cd ../.." if os.path.basename(cwd) == "Lab07" else "  cd ..")
+        print("  python Labs/Lab07/setup.py")
+        sys.exit(1)
 
 
 def setup():
+    check_location()
+
     root = "trip_notes"
 
-    # Check: don't overwrite an existing project
     if os.path.exists(root):
-        print(f"'{root}/' already exists. Delete it first if you want a fresh setup.")
+        print(f"'{root}/' already exists.")
+        print("To re-download tests and prompts only, run:")
+        print("  python Labs/Lab07/setup.py --refresh")
         return
 
-    print("Creating trip_notes/ project structure...")
+    print(f"Creating {root}/ in: {os.getcwd()}")
+    print()
 
     # Create directories
     for d in ["src", "data", "tests", "prompts"]:
@@ -55,29 +71,57 @@ def setup():
     with open(os.path.join(root, "README.md"), "w") as f:
         f.write("# Trip Notes\n")
 
-    print("Downloading lab files...")
+    print("Downloading lab files into trip_notes/...")
 
-    # Download tests and prompts
+    failed = []
     for remote, local in DOWNLOADS:
         dest = os.path.join(root, local)
         url = BASE_URL + remote
         try:
             urllib.request.urlretrieve(url, dest)
-            print(f"  ✓  {local}")
+            print(f"  ✓  trip_notes/{local}")
         except Exception as e:
-            print(f"  ✗  {local}  ({e})")
-            print(f"     Retry manually: curl -o {dest} {url}")
+            print(f"  ✗  trip_notes/{local}  ({e})")
+            failed.append((dest, url))
 
     print()
-    print("Setup complete! Your project is ready at: trip_notes/")
+    if failed:
+        print("Some downloads failed. Retry manually:")
+        for dest, url in failed:
+            print(f"  curl -o {dest} {url}")
+        print()
+
+    print("Done! Your project is at: trip_notes/")
     print()
     print("Next steps:")
-    print("  1. cd trip_notes")
-    print("  2. Open VS Code with two terminals (see Lab 07 instructions)")
-    print("  3. Terminal 1: start your AI agent")
-    print("  4. Terminal 2: run tests and git commands")
-    print("  5. Start Exercise 2: give your AI  @prompts/ex2_models.md")
+    print("  cd trip_notes")
+    print("  Open VS Code with two terminals (Terminal 1: AI, Terminal 2: run/test)")
+    print("  Terminal 2: python tests/test_flow.py   (expect import errors — normal)")
+    print("  Terminal 1: Please read and follow the instructions in @prompts/Lab07_Ex02_models.md")
+
+
+def refresh():
+    """Re-download tests and prompts without recreating the project."""
+    root = "trip_notes"
+    if not os.path.exists(root):
+        print("trip_notes/ not found. Run without --refresh first.")
+        sys.exit(1)
+
+    print(f"Refreshing tests/ and prompts/ in trip_notes/...")
+    for remote, local in DOWNLOADS:
+        dest = os.path.join(root, local)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        url = BASE_URL + remote
+        try:
+            urllib.request.urlretrieve(url, dest)
+            print(f"  ✓  trip_notes/{local}")
+        except Exception as e:
+            print(f"  ✗  {local}  ({e})")
 
 
 if __name__ == "__main__":
-    setup()
+    if "--refresh" in sys.argv:
+        check_location()
+        refresh()
+    else:
+        setup()
