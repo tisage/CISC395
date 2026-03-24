@@ -50,7 +50,7 @@ if not key.startswith("sk-or-"):
 else:
     print(f"\u2713  Key found: {key[:16]}...")
 
-MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+MODEL = "openrouter/free"
 
 client = OpenAI(
     api_key=key,
