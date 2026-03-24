@@ -78,7 +78,7 @@ ok("TRAVEL_SYSTEM_PROMPT defined") if (
             "Define TRAVEL_SYSTEM_PROMPT as a non-empty string constant")
 
 ok("MODEL defined") if (hasattr(ai, "MODEL") and isinstance(ai.MODEL, str)) else \
-    fail("MODEL not defined", "Add:  MODEL = 'openrouter/free'")
+    fail("MODEL not defined", "Add:  MODEL = 'meta-llama/llama-3.3-70b-instruct:free'")
 
 ok("client defined") if hasattr(ai, "client") else \
     fail("client not found", "Create a module-level OpenAI client named 'client'")

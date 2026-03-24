@@ -24,7 +24,7 @@ Then create src/ai_assistant.py with the following:
        api_key=os.getenv("OPENROUTER_API_KEY"),
        base_url="https://openrouter.ai/api/v1",
    )
-   MODEL = "openrouter/free"
+   MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 
 3. A constant TRAVEL_SYSTEM_PROMPT (str) that defines a knowledgeable,
    concise travel assistant focused on practical, budget-friendly advice

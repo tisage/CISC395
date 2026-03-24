@@ -50,7 +50,7 @@ if not key.startswith("sk-or-"):
 else:
     print(f"\u2713  Key found: {key[:16]}...")
 
-MODEL = "openrouter/free"
+MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 
 client = OpenAI(
     api_key=key,
@@ -72,7 +72,8 @@ try:
         temperature=0.0,
     )
     elapsed = time.time() - start
-    text = response.choices[0].message.content.strip()
+    content = response.choices[0].message.content
+    text = content.strip() if content else "(empty response — model may be warming up)"
     actual_model = response.model
 
     print(f"\u2713  Response ({elapsed:.1f}s): {text}")
