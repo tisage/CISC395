@@ -19,7 +19,7 @@ load_dotenv()
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+MODEL = "openrouter/free"
 
 # Alternative free models (change MODEL string to switch):
 # "google/gemini-2.0-flash-exp:free"      ← Google Gemini

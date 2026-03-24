@@ -50,7 +50,7 @@ if not key.startswith("sk-or-"):
 else:
     print(f"\u2713  Key found: {key[:16]}...")
 
-MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+MODEL = "openrouter/free"
 
 client = OpenAI(
     api_key=key,
@@ -69,23 +69,23 @@ try:
             {"role": "user", "content": "Reply with exactly three words: API test successful"}
         ],
         max_tokens=20,
-        temperature=0.0,
+        extra_body={"reasoning": {"enabled": True}},
     )
     elapsed = time.time() - start
-    content = response.choices[0].message.content
-    text = content.strip() if content else "(empty response — model may be warming up)"
+    msg = response.choices[0].message
+    content = msg.content
     actual_model = response.model
+
+    # With reasoning enabled, content may be None — check reasoning_details too
+    if content:
+        text = content.strip()
+    elif hasattr(msg, "reasoning_details") and msg.reasoning_details:
+        text = "(reasoning response — content in reasoning_details)"
+    else:
+        text = "(empty response — key works but model returned nothing)"
 
     print(f"\u2713  Response ({elapsed:.1f}s): {text}")
     print(f"\u2713  Model confirmed: {actual_model}")
-    print()
-
-    if ":free" not in actual_model and "free" not in actual_model.lower():
-        print("\u26a0  The model returned may not be free.")
-        print("   Check your OpenRouter dashboard for usage/billing.")
-    else:
-        print("\u2713  Model is free \u2014 no charges.")
-
     print()
     print("Your OpenRouter API key is working. Ready for Lab 08.")
 
