@@ -3,18 +3,22 @@ It has ask() and TRAVEL_SYSTEM_PROMPT already defined.
 
 Add a new function to src/ai_assistant.py:
 
-generate_trip_briefing(destination_name: str, country: str) -> dict
+generate_trip_briefing(city: str, country: str, notes: list = None) -> dict
 
 This function makes two sequential API calls (prompt chaining):
 
 Call 1 — Overview:
-  prompt: f"Give a 3-sentence travel overview of {destination_name}, {country}.
-            Cover: what it's like to visit, best season to go, and one must-see attraction."
+  Build the prompt:
+    base = f"Give a 3-sentence travel overview of {city}, {country}. Cover: what it's like to visit, best season to go, and one must-see attraction."
+    If notes is not None and len(notes) > 0:
+        notes_text = "\n".join(f"- {n}" for n in notes)
+        prompt = base + f"\n\nPersonal notes about this trip:\n{notes_text}"
+    Else:
+        prompt = base
   Use: system_prompt=TRAVEL_SYSTEM_PROMPT
 
-Call 2 — Packing list (uses Call 1 output):
-  prompt: f"Based on this destination overview:\n{overview}\n\n
-            Write a 5-item packing list specific to {destination_name}."
+Call 2 — Packing list (uses Call 1 output as context):
+  prompt: f"Based on this destination overview:\n{overview}\n\nWrite a 5-item packing list specific to {city}."
   Use: system_prompt=TRAVEL_SYSTEM_PROMPT
 
 Return: {"overview": overview, "packing_list": packing_list}

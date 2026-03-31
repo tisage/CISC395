@@ -26,6 +26,7 @@ DOWNLOADS = [
     ("prompts/Lab08_Ex01_assistant.md", "prompts/Lab08_Ex01_assistant.md"),
     ("prompts/Lab08_Ex03_menu.md",      "prompts/Lab08_Ex03_menu.md"),
     ("prompts/Lab08_Ex04_chaining.md",  "prompts/Lab08_Ex04_chaining.md"),
+    ("prompts/Lab08_Ex04b_menu.md",     "prompts/Lab08_Ex04b_menu.md"),
 ]
 
 def check_location():

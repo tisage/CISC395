@@ -92,10 +92,14 @@ if hasattr(ai, "generate_trip_briefing") and callable(ai.generate_trip_briefing)
     ok("generate_trip_briefing() exists")
     sig2 = inspect.signature(ai.generate_trip_briefing)
     params2 = list(sig2.parameters)
-    ok("has destination_name parameter") if "destination_name" in params2 else \
-        fail("missing destination_name parameter")
+    ok("has city parameter") if "city" in params2 else \
+        fail("missing city parameter",
+             "Signature should be: generate_trip_briefing(city, country, notes=None)")
     ok("has country parameter") if "country" in params2 else \
         fail("missing country parameter")
+    ok("has notes parameter (optional)") if "notes" in params2 else \
+        fail("missing notes parameter",
+             "Add: notes: list = None  — pass destination notes for personalized briefing")
 else:
     print("  \u2014  generate_trip_briefing() not found (complete Exercise 4 first)")
 

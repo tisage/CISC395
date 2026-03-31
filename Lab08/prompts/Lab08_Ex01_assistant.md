@@ -34,9 +34,19 @@ Then create src/ai_assistant.py with the following:
 4. A function:
    ask(user_message, system_prompt=None, temperature=0.7, max_tokens=500) -> str | None
    - Builds messages list: system message first (if system_prompt provided), then user
-   - Calls client.chat.completions.create(model=MODEL, messages=messages,
-       temperature=temperature, max_tokens=max_tokens)
-   - Returns response.choices[0].message.content
+   - Calls client.chat.completions.create(
+         model=MODEL,
+         messages=messages,
+         temperature=temperature,
+         max_tokens=max_tokens,
+         extra_body={"reasoning": {"enabled": True}},
+     )
+   - Gets content: msg = response.choices[0].message; content = msg.content
+   - openrouter/free may return content=None when using reasoning — handle it:
+       if content is not None: return content
+       elif hasattr(msg, "reasoning_details") and msg.reasoning_details:
+           return msg.reasoning_details[0].get("summary", "") or ""
+       else: return ""
    - Handles these exceptions with a friendly print and returns None:
        openai.AuthenticationError
        openai.RateLimitError
