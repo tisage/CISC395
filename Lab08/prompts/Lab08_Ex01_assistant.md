@@ -24,7 +24,7 @@ Then create src/ai_assistant.py with the following:
        api_key=os.getenv("OPENROUTER_API_KEY"),
        base_url="https://openrouter.ai/api/v1",
    )
-   MODEL = "openrouter/free"
+   MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 
 3. A constant TRAVEL_SYSTEM_PROMPT (str) that defines a knowledgeable,
    concise travel assistant focused on practical, budget-friendly advice
@@ -39,14 +39,9 @@ Then create src/ai_assistant.py with the following:
          messages=messages,
          temperature=temperature,
          max_tokens=max_tokens,
-         extra_body={"reasoning": {"enabled": True}},
+         timeout=30,
      )
-   - Gets content: msg = response.choices[0].message; content = msg.content
-   - openrouter/free may return content=None when using reasoning — handle it:
-       if content is not None: return content
-       elif hasattr(msg, "reasoning_details") and msg.reasoning_details:
-           return msg.reasoning_details[0].get("summary", "") or ""
-       else: return ""
+   - Returns response.choices[0].message.content (str or None)
    - Handles these exceptions with a friendly print and returns None:
        openai.AuthenticationError
        openai.RateLimitError
