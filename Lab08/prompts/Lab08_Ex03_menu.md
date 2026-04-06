@@ -1,28 +1,51 @@
 I have a Trip Notes CLI app. Read src/main.py and src/ai_assistant.py first.
 
-src/main.py has a working menu loop with options [1]–[5].
-src/ai_assistant.py has ask() and TRAVEL_SYSTEM_PROMPT.
+src/main.py already has:
+- A grouped menu: [1]–[4] under "-- Data --", an empty "-- AI --" section, and [Q] Quit
+- Exit handled by: if choice.lower() == "q": break
 
-Update src/main.py to add option [6] Ask AI:
+src/ai_assistant.py has: ask(), generate_trip_briefing(), and TRAVEL_SYSTEM_PROMPT.
 
-1. Add to imports at the top:
-   from src.ai_assistant import ask, TRAVEL_SYSTEM_PROMPT
+Add these two options under the "-- AI --" section:
 
-2. Add "[6] Ask AI a travel question" to the menu display.
+---
 
-3. Add a handler for choice "6":
-   a. Input: "Your question: "
-   b. Call ask(question, system_prompt=TRAVEL_SYSTEM_PROMPT)
-   c. If the result is None (API error), print an error message and return to menu
-   d. Print the AI response
-   e. Ask: "Save this as a note on a trip? (y/n): "
-   f. If "y":
-      - Print all saved trips numbered (use collection.get_all())
-      - Input: "Trip number: " (convert to int, subtract 1 for index)
-      - Get the trip with collection.get_by_index(index)
-      - Call trip.add_note(response)
-      - Call save_trips(collection)
-      - Print: "Saved as a note on [trip name]."
-   g. If "n": return to menu
+OPTION [6] — Ask AI a travel question:
+
+Add to imports:
+  from src.ai_assistant import ask, generate_trip_briefing, TRAVEL_SYSTEM_PROMPT
+
+Add "[6] Ask AI a travel question" to the -- AI -- section of the menu display.
+
+Handler for choice "6":
+  a. Input: "Your question: "
+  b. Call ask(question, system_prompt=TRAVEL_SYSTEM_PROMPT)
+  c. If result is None: print an error message and continue
+  d. Print the AI response
+  e. Ask: "Save this as a note on a trip? (y/n): "
+  f. If "y":
+     - Print all saved trips numbered (use collection.get_all())
+     - Input: "Trip number: " (int, subtract 1 for index)
+     - Get the trip with collection.get_by_index(index)
+     - Call trip.add_note(response)
+     - Call save_trips(collection)
+     - Print: "Saved as a note on [trip name]."
+
+---
+
+OPTION [7] — Trip briefing:
+
+Add "[7] Generate trip briefing" to the -- AI -- section of the menu display.
+
+Handler for choice "7":
+  a. Print all saved trips numbered (use collection.get_all())
+  b. If no trips: print "No trips saved yet." and continue
+  c. Input: "Trip number: " (int, subtract 1 for index)
+  d. Get the trip with collection.get_by_index(index)
+  e. Call generate_trip_briefing(trip)
+  f. If result is None: print an error message and continue
+  g. Print the briefing
+
+---
 
 Write the updated file directly to src/main.py.

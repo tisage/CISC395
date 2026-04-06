@@ -23,6 +23,7 @@ DOWNLOADS = [
     ("tests/check_openrouter.py",       "tests/check_openrouter.py"),
     ("tests/check_gemini.py",           "tests/check_gemini.py"),
     ("tests/test_ai_assistant.py",      "tests/test_ai_assistant.py"),
+    ("prompts/Lab08_Setup_menu.md",     "prompts/Lab08_Setup_menu.md"),
     ("prompts/Lab08_Ex01_assistant.md", "prompts/Lab08_Ex01_assistant.md"),
     ("prompts/Lab08_Ex03_menu.md",      "prompts/Lab08_Ex03_menu.md"),
     ("prompts/Lab08_Ex04_chaining.md",  "prompts/Lab08_Ex04_chaining.md"),
