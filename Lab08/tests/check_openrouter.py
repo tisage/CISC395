@@ -50,7 +50,7 @@ if not key.startswith("sk-or-"):
 else:
     print(f"\u2713  Key found: {key[:16]}...")
 
-MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+MODEL = "openrouter/free"
 
 client = OpenAI(
     api_key=key,
@@ -93,8 +93,12 @@ except openai.AuthenticationError:
     sys.exit(1)
 
 except openai.RateLimitError:
-    print("\u2717  Rate limit hit.")
-    print("   Wait 1 minute and try again, or use: python tests/check_gemini.py")
+    print("\u2717  Rate limit hit — free model quota exceeded.")
+    print("   Option 1: Wait a few minutes and try again.")
+    print("   Option 2: Edit MODEL in this file to try a different free model:")
+    print("       google/gemma-3-27b-it:free")
+    print("       mistralai/mistral-7b-instruct:free")
+    print("   Option 3: Use Gemini backup:  python tests/check_gemini.py")
     sys.exit(1)
 
 except openai.APIConnectionError as e:
