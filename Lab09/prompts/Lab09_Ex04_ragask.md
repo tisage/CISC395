@@ -5,7 +5,7 @@ In my Trip Notes project (run from trip_notes/):
     (auto-builds the index if chroma_db/ is empty)
 
 - src/ai_assistant.py already has:
-    ask(prompt: str, system_prompt: str = None, temperature: float = 0.7) -> str
+    ask(prompt: str, system_prompt: str = None, temperature: float = 0.7, max_tokens: int = 1024) -> str
 
 Add a function rag_ask(question: str) -> str to src/ai_assistant.py:
 
@@ -20,13 +20,19 @@ Add a function rag_ask(question: str) -> str to src/ai_assistant.py:
 4. Join chunks with "\n\n---\n\n" as separator to form context
 
 5. Build this system prompt (use an f-string):
-   "You are a travel assistant. Answer the question using ONLY the context below.
-    If the answer is not in the context, say: I don't have information about that in my guides.
+   "You are a travel assistant with access to the user's personal travel guides.
+    Use the context below as your PRIMARY source. If the context contains relevant
+    information, use it in your answer. If the context is insufficient, you may
+    supplement with general knowledge but clearly indicate what comes from the guides
+    and what is general advice. If the context has nothing relevant at all, say:
+    I don't have specific guide information about that.
 
-    Context:
+    Context from your travel guides:
     {context}"
 
-6. Call ask(question, system_prompt=rag_system_prompt) and return the result
+6. Call ask(question, system_prompt=rag_system_prompt, max_tokens=2048) and return the result
+   (max_tokens=2048 because the context is longer and the answer may be detailed)
 
 Place rag_ask() after the existing ask() function.
 Do not modify ask() or any existing code.
+Write the updated file directly to src/ai_assistant.py.

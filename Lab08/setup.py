@@ -16,8 +16,36 @@ import sys
 import urllib.request
 
 BASE_URL = "https://raw.githubusercontent.com/tisage/CISC395/refs/heads/main/Lab08/"
+ZIP_URL  = "https://github.com/tisage/CISC395/archive/refs/heads/main.zip"
 
-# All files download into trip_notes/ (paths are relative to trip_notes/)
+
+def download_file(url, dest):
+    """Download a file and verify it is not empty or an HTML error page.
+    Returns (success: bool, reason: str)."""
+    try:
+        urllib.request.urlretrieve(url, dest)
+    except Exception as e:
+        return False, str(e)
+
+    # Empty file
+    if os.path.getsize(dest) == 0:
+        os.remove(dest)
+        return False, "empty file (server returned nothing)"
+
+    # HTML error page returned by firewall / proxy
+    try:
+        with open(dest, "r", errors="ignore") as f:
+            first = f.read(80).lstrip()
+        if first.startswith("<"):
+            os.remove(dest)
+            return False, "blocked by network (received HTML instead of file)"
+    except Exception:
+        pass
+
+    return True, None
+SHARED_URL = "https://raw.githubusercontent.com/tisage/CISC395/refs/heads/main/shared/"
+
+# Lab-specific files — downloaded from Lab08/
 DOWNLOADS = [
     ("tests/check_api_setup.py",        "tests/check_api_setup.py"),
     ("tests/check_openrouter.py",       "tests/check_openrouter.py"),
@@ -28,6 +56,11 @@ DOWNLOADS = [
     ("prompts/Lab08_Ex03_menu.md",      "prompts/Lab08_Ex03_menu.md"),
     ("prompts/Lab08_Ex04_chaining.md",  "prompts/Lab08_Ex04_chaining.md"),
     ("prompts/Lab08_Ex04b_menu.md",     "prompts/Lab08_Ex04b_menu.md"),
+]
+
+# Shared utilities — downloaded from shared/ and always kept current
+SHARED_DOWNLOADS = [
+    ("check_progress.py", "tests/check_progress.py"),
 ]
 
 def check_location():
@@ -60,21 +93,26 @@ def setup():
     # Download files into trip_notes/
     print("Downloading...")
     failed = []
-    for remote, local in DOWNLOADS:
+    all_downloads = [(BASE_URL + r, l) for r, l in DOWNLOADS] + \
+                    [(SHARED_URL + r, l) for r, l in SHARED_DOWNLOADS]
+    for url, local in all_downloads:
         dest = os.path.join(root, local)
-        url = BASE_URL + remote
-        try:
-            urllib.request.urlretrieve(url, dest)
+        ok, reason = download_file(url, dest)
+        if ok:
             print(f"  \u2713  trip_notes/{local}")
-        except Exception as e:
-            print(f"  \u2717  trip_notes/{local}  ({e})")
-            failed.append((dest, url))
+        else:
+            print(f"  \u2717  trip_notes/{local}  ({reason})")
+            failed.append(local)
 
     print()
     if failed:
-        print("Some downloads failed. Retry manually:")
-        for dest, url in failed:
-            print(f"  curl -o {dest} {url}")
+        print(f"  {len(failed)} file(s) failed to download:")
+        for f in failed:
+            print(f"    - trip_notes/{f}")
+        print()
+        print("  Fix: Download the ZIP and copy the missing files manually:")
+        print(f"    {ZIP_URL}")
+        print("  Extract and copy the missing files from Lab08/ into trip_notes/.")
         print()
 
     print("Done! Lab 08 files downloaded to trip_notes/.")
@@ -93,15 +131,16 @@ def refresh():
         print("trip_notes/ not found. Run without --refresh first.")
         sys.exit(1)
     print("Refreshing Lab 08 files in trip_notes/...")
-    for remote, local in DOWNLOADS:
+    all_downloads = [(BASE_URL + r, l) for r, l in DOWNLOADS] + \
+                    [(SHARED_URL + r, l) for r, l in SHARED_DOWNLOADS]
+    for url, local in all_downloads:
         dest = os.path.join(root, local)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        url = BASE_URL + remote
-        try:
-            urllib.request.urlretrieve(url, dest)
+        ok, reason = download_file(url, dest)
+        if ok:
             print(f"  \u2713  trip_notes/{local}")
-        except Exception as e:
-            print(f"  \u2717  {local}  ({e})")
+        else:
+            print(f"  \u2717  {local}  ({reason})")
 
 
 if __name__ == "__main__":

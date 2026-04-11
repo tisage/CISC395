@@ -32,7 +32,7 @@ Then create src/ai_assistant.py with the following:
    name places, not generalities.
 
 4. A function:
-   ask(user_message, system_prompt=None, temperature=0.7, max_tokens=500) -> str | None
+   ask(user_message, system_prompt=None, temperature=0.7, max_tokens=1024) -> str | None
    - Builds messages list: system message first (if system_prompt provided), then user
    - Calls client.chat.completions.create(
          model=MODEL,
@@ -42,10 +42,12 @@ Then create src/ai_assistant.py with the following:
          timeout=30,
      )
    - Returns response.choices[0].message.content (str or None)
+   - If content is None: return "" (empty string, not None)
    - Handles these exceptions with a friendly print and returns None:
        openai.AuthenticationError
        openai.RateLimitError
        openai.APIConnectionError
+       openai.APITimeoutError
 
 5. Under if __name__ == "__main__":
    result = ask("What is the best time of year to visit Japan?",
