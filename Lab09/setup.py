@@ -99,10 +99,15 @@ def setup():
     print()
     print("Downloading...")
     failed = []
-    all_downloads = [(BASE_URL + r, l) for r, l in DOWNLOADS] + \
-                    [(SHARED_URL + r, l) for r, l in SHARED_DOWNLOADS]
-    for url, local in all_downloads:
+    all_downloads = [(BASE_URL + r, l, False) for r, l in DOWNLOADS] + \
+                    [(SHARED_URL + r, l, False) for r, l in SHARED_DOWNLOADS]
+
+    for url, local, _ in all_downloads:
         dest = os.path.join(root, local)
+        # For guides: skip if the file already exists (don't overwrite student work)
+        if local.startswith("guides/") and os.path.exists(dest):
+            print(f"  -  trip_notes/{local}  (already exists, skipped)")
+            continue
         ok, reason = download_file(url, dest)
         if ok:
             print(f"  \u2713  trip_notes/{local}")
@@ -143,6 +148,10 @@ def refresh():
     for url, local in all_downloads:
         dest = os.path.join(root, local)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
+        # For guides: skip if already exists even on refresh
+        if local.startswith("guides/") and os.path.exists(dest):
+            print(f"  -  trip_notes/{local}  (skipped)")
+            continue
         ok, reason = download_file(url, dest)
         if ok:
             print(f"  \u2713  trip_notes/{local}")
