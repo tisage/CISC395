@@ -15,7 +15,7 @@ Add a function rag_ask(question: str) -> str to src/ai_assistant.py:
 2. Call search_guides(question, n_results=3) to get relevant chunks
 
 3. If chunks is empty or None:
-   return "No guides found. Add .txt, .md, or .pdf files to guides/ and select [9] Rebuild index."
+   return "No guides found. Add .txt, .md, or .pdf files to guides/ and press [R] to rebuild the index."
 
 4. Join chunks with "\n\n---\n\n" as separator to form context
 

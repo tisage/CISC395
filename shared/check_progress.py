@@ -280,10 +280,82 @@ def check_lab09():
     else:
         skip("[8] Search my guides not yet in main.py (complete Lab 09 Exercise 4)")
 
+    if '== "r"' in main_text or "== 'r'" in main_text:
+        ok("[R] Rebuild search index added to main.py")
+    else:
+        skip("[R] Rebuild index not yet in main.py (complete Lab 09 Exercise 4)")
+
     return True
 
 
-# ── Environment check ─────────────────────────────────────────────────────────
+# ── Lab 10 checks ─────────────────────────────────────────────────────────────
+
+def check_lab10():
+    section("Lab 10 — Function Calling + ReAct Agent")
+
+    if not os.path.exists(b("src/tools.py")):
+        fail("src/tools.py missing", "Complete Lab 10 Exercise 1")
+        return False
+
+    try:
+        import src.tools as tools
+        ok("import src.tools")
+    except ImportError as e:
+        fail(f"Cannot import src.tools: {e}")
+        return False
+
+    # Three tool functions
+    for fn in ["budget_breakdown", "get_weather", "search_guides_tool"]:
+        ok(f"{fn}() exists") if hasattr(tools, fn) and callable(getattr(tools, fn)) \
+            else fail(f"{fn}() missing", "Complete Lab 10 Exercise 1")
+
+    # TOOL_DEFINITIONS
+    if hasattr(tools, "TOOL_DEFINITIONS") and isinstance(tools.TOOL_DEFINITIONS, list):
+        ok(f"TOOL_DEFINITIONS defined ({len(tools.TOOL_DEFINITIONS)} tools)")
+        ok("TOOL_DEFINITIONS has 3 entries") if len(tools.TOOL_DEFINITIONS) == 3 \
+            else fail(f"TOOL_DEFINITIONS has {len(tools.TOOL_DEFINITIONS)} entries, expected 3")
+    else:
+        fail("TOOL_DEFINITIONS missing or not a list")
+
+    # Quick smoke test of budget_breakdown (pure math, always safe to call)
+    try:
+        result = tools.budget_breakdown("Tokyo", 7, 1400)
+        ok("budget_breakdown() returns a string") if isinstance(result, str) \
+            else fail("budget_breakdown() did not return a string")
+    except Exception as e:
+        fail(f"budget_breakdown() raised an error: {e}")
+
+    # Check get_weather exists and accepts city parameter
+    if hasattr(tools, "get_weather"):
+        import inspect
+        params = list(inspect.signature(tools.get_weather).parameters)
+        ok("get_weather() has city parameter") if "city" in params \
+            else fail("get_weather() missing city parameter")
+
+    # Check search_guides_tool exists and accepts query parameter
+    if hasattr(tools, "search_guides_tool"):
+        import inspect
+        params = list(inspect.signature(tools.search_guides_tool).parameters)
+        ok("search_guides_tool() has query parameter") if "query" in params \
+            else fail("search_guides_tool() missing query parameter")
+
+    # run_agent()
+    if hasattr(tools, "run_agent") and callable(tools.run_agent):
+        ok("run_agent() exists")
+    else:
+        skip("run_agent() not found (complete Lab 10 Exercise 2)")
+
+    # main.py — [10] AI Travel Agent
+    main_text = open(b("src/main.py")).read()
+    if '"10"' in main_text or "'10'" in main_text:
+        ok("[10] AI Travel Agent added to main.py")
+    else:
+        skip("[10] AI Travel Agent not yet in main.py (complete Lab 10 Exercise 3)")
+
+    return True
+
+
+# ── Environment check ───────────────────────────────────────────────────────��─
 
 def check_env():
     section("Environment — CISC395/ root")
@@ -330,8 +402,8 @@ def main():
         description="Check Trip Notes progress before starting a lab."
     )
     parser.add_argument(
-        "--lab", type=int, choices=[7, 8, 9], default=None,
-        help="Lab number to check prerequisites for (7, 8, or 9)"
+        "--lab", type=int, choices=[7, 8, 9, 10], default=None,
+        help="Lab number to check prerequisites for (7, 8, 9, or 10)"
     )
     parser.add_argument(
         "--env", action="store_true",
@@ -342,7 +414,9 @@ def main():
     # Auto-detect if no --lab given
     lab = args.lab
     if lab is None:
-        if os.path.exists(b("src/rag.py")) or os.path.isdir(b("guides")):
+        if os.path.exists(b("src/tools.py")):
+            lab = 10
+        elif os.path.exists(b("src/rag.py")) or os.path.isdir(b("guides")):
             lab = 9
         elif os.path.exists(b("src/ai_assistant.py")):
             lab = 8
@@ -375,8 +449,14 @@ def main():
             print("\n[Lab 09 — RAG Document Search]")
             print("  Skipped — fix Lab 08 issues first.")
 
+    if lab >= 10:
+        if os.path.exists(b("src/rag.py")):
+            check_lab10()
+        else:
+            print("\n[Lab 10 — Function Calling + ReAct Agent]")
+            print("  Skipped — complete Lab 09 (src/rag.py) first.")
+
     # Summary
-    total = passed + failed + skipped
     print(f"\n{'─' * 45}")
     print(f"  ✓ {passed} passed   ✗ {failed} failed   — {skipped} skipped")
     print(f"{'─' * 45}")
