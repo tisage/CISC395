@@ -18,9 +18,9 @@ CHANGE 2 — Reformat the menu display into visual groups:
 
   -- Data --
   [1] Add destination
-  [2] List all destinations
-  [3] Mark as visited
-  [4] Show statistics
+  [2] View all destinations
+  [3] Search by country
+  [4] Add note to a destination
 
   -- AI --
   (coming soon)

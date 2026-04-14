@@ -110,9 +110,14 @@ def run_tests():
     print("\n[ Storage ]")
     data_path = os.path.join(BASE_DIR, "data", "trips.json")
 
-    # Remove any leftover file from a previous run
+    # Preserve any existing student data before running storage tests
+    backup = None
     if os.path.exists(data_path):
-        os.remove(data_path)
+        with open(data_path) as f:
+            content = f.read().strip()
+        if content and content != "[]":
+            backup = content
+            print("  (trips.json has existing data — will restore after test)")
 
     save_trips(col)
     check("save_trips() creates data/trips.json", os.path.exists(data_path),
@@ -133,9 +138,14 @@ def run_tests():
     check("loaded Destination preserves notes",
           "Visit Shibuya" in col2.get_by_index(0).notes)
 
-    # Cleanup — remove test data so it does not end up committed
-    os.remove(data_path)
-    check("test data cleaned up", not os.path.exists(data_path))
+    # Restore original data if it existed, otherwise clean up test data
+    if backup is not None:
+        with open(data_path, "w") as f:
+            f.write(backup)
+        check("original trips.json restored", os.path.exists(data_path))
+    else:
+        os.remove(data_path)
+        check("test data cleaned up", not os.path.exists(data_path))
 
     _print_summary()
 

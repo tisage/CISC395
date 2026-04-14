@@ -26,8 +26,8 @@ Required imports to add:
 
 Menu display should look like:
   -- Data --
-  [1] Add destination       [2] List all destinations
-  [3] Mark as visited       [4] Show statistics
+  [1] Add destination           [2] View all destinations
+  [3] Search by country         [4] Add note to a destination
 
   -- AI --
   [6] Ask AI                [7] Trip Briefing

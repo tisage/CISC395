@@ -1,7 +1,7 @@
 In my Trip Notes project (run from trip_notes/):
 
 src/main.py already has a grouped menu:
-  -- Data --   [1] Add  [2] List  [3] Mark visited  [4] Statistics
+  -- Data --   [1] Add  [2] View all  [3] Search by country  [4] Add note
   -- AI --     [6] Ask AI  [7] Trip Briefing  [8] Search guides
   [R] Rebuild search index
   [Q] Quit
@@ -16,7 +16,7 @@ Add option [10] AI Travel Agent to the -- AI -- section of src/main.py:
 2. Add "[10] AI Travel Agent" to the -- AI -- section of the menu display.
 
 3. Handler for choice "10":
-   a. Print: "The agent can calculate budgets, suggest packing lists, and check visa info."
+   a. Print: "The agent can calculate budgets, check real-time weather, and search your travel guides."
    b. Input: "Your question: "
    c. Print: "\nThinking...\n"
    d. Call run_agent(question) — tool call traces will print automatically
