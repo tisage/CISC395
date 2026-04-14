@@ -55,7 +55,9 @@ Add a clear description for each tool so the LLM knows when to use it:
 
 ---
 
-Imports needed at the top of the file:
+Imports needed at the top of the file (in this exact order):
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import json
 import urllib.request
 from src.rag import search_guides, ensure_index

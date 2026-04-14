@@ -43,6 +43,7 @@ DOWNLOADS = [
     ("prompts/Lab10_Ex01_tools.md",  "prompts/Lab10_Ex01_tools.md"),
     ("prompts/Lab10_Ex02_agent.md",  "prompts/Lab10_Ex02_agent.md"),
     ("prompts/Lab10_Ex03_menu.md",   "prompts/Lab10_Ex03_menu.md"),
+    ("tests/test_agent.py",          "tests/test_agent.py"),
 ]
 
 SHARED_DOWNLOADS = [
