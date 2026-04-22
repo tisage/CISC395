@@ -1,45 +1,52 @@
 Read src/app.py first.
 
-In src/app.py, replace the `st.info("Coming soon — Exercise 2")` line inside the Chat tab (tab1) with a full chat interface. Do not change tab2, tab3, or the sidebar.
+Replace the `st.info("Coming soon — Exercise 2")` placeholder inside the Chat tab with a working chat interface. Do not modify the sidebar, tab2, or tab3.
 
 ---
 
-## Chat tab (tab1) replacement
+## Layout
 
-```python
-with tab1:
-    st.subheader("Chat with AI")
-    st.caption("General travel assistant — ask anything.")
+```
+💬 Chat  │  🔍 Search  │  🤖 Agent
 
-    # Display chat history
-    for msg in st.session_state["chat_history"]:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
+Chat with AI
+General travel assistant — ask anything.
 
-    # Handle new input
-    user_input = st.chat_input("Ask about travel...")
-    if user_input:
-        st.session_state["chat_history"].append({"role": "user", "content": user_input})
-        with st.chat_message("user"):
-            st.write(user_input)
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                response = ask(user_input, system_prompt=TRAVEL_SYSTEM_PROMPT)
-            st.write(response)
-        st.session_state["chat_history"].append({"role": "assistant", "content": response})
+┌──────────────────────────────────────────────┐
+│  👤  What are good things to pack for a      │
+│      rainy-season trip to Southeast Asia?    │
+│                                              │
+│  🤖  Great question! For rainy season...     │
+│                                              │
+│  👤  Which of those also work for cold       │
+│      mountain trips?                         │
+│                                              │
+│  🤖  For colder mountain conditions...       │
+└──────────────────────────────────────────────┘
 
-    # Clear button
-    if st.button("Clear chat", key="clear_chat"):
-        st.session_state["chat_history"] = []
-        st.rerun()
+[ Ask about travel...                     ↵ ]   ← pinned at bottom of tab
+
+[ Clear chat ]
 ```
 
 ---
 
-## Notes
+## Behavior requirements
 
-- `ask` and `TRAVEL_SYSTEM_PROMPT` are already imported from src.ai_assistant in Exercise 1 — do not add duplicate imports.
-- `st.chat_input` renders pinned at the bottom of the tab area automatically.
-- The `key="clear_chat"` parameter is required because there will be buttons in other tabs; Streamlit requires unique keys across all buttons on the page.
-- Do not change tab2, tab3, or the sidebar section.
-- After saving, run `streamlit run src/app.py` and verify that typing a message shows both the user bubble and the assistant response, and that clicking "Clear chat" removes all messages.
+- Display all messages in `st.session_state["chat_history"]` as a conversation using `st.chat_message` with the message's role (`"user"` or `"assistant"`)
+- Accept new input via `st.chat_input` — it renders pinned at the bottom of the tab automatically
+- When the user submits a message:
+  1. Append the user message to `"chat_history"`
+  2. Call `ask(user_input, system_prompt=TRAVEL_SYSTEM_PROMPT)` with a spinner showing "Thinking..."
+  3. Display the assistant response immediately
+  4. Append the assistant response to `"chat_history"`
+- "Clear chat" button: clears `st.session_state["chat_history"]` and reruns the app
+
+---
+
+## Critical constraints
+
+- `ask` and `TRAVEL_SYSTEM_PROMPT` are already imported in Exercise 1 — do not add duplicate imports
+- `st.chat_input` and `st.button` each need a unique `key` parameter because Streamlit requires all interactive widgets to have unique keys across the whole page — use `key="clear_chat"` for the button
+- Do NOT use `key=` on `st.chat_input` in tab1 (leave it as the default); tabs 2 and 3 will need explicit keys
+- Do not change the sidebar, tab2, or tab3 code

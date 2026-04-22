@@ -1,71 +1,59 @@
-Read src/app.py first.
+Read src/app.py and src/tools.py first.
 
-In src/app.py, replace the `st.info("Coming soon — Exercise 4")` line inside the Agent tab (tab3) with a ReAct agent interface. Do not change tab1, tab2, or the sidebar.
+Replace the `st.info("Coming soon — Exercise 4")` placeholder inside the Agent tab with a ReAct agent interface. Do not modify the sidebar, tab1, or tab2.
 
 ---
 
-## New import to add at the top of app.py
+## Layout
 
-Add this line to the import block if it is not already present:
+```
+💬 Chat  │  🔍 Search  │  🤖 Agent
 
-```python
-from src.tools import run_agent, TOOL_DEFINITIONS
+AI Travel Agent
+The agent uses tools: budget calculation, live weather, and guide search.
+
+Your question:
+┌──────────────────────────────────────────────────────┐
+│  e.g. I have $1200 for 8 days in Tokyo. Check the   │
+│  weather and break down my budget.                   │
+│                                                      │  ← st.text_area (resizable)
+└──────────────────────────────────────────────────────┘
+
+[ Ask the Agent ]
+
+──────────────────────────────────────────────────────
+Agent answer displayed here as markdown
+──────────────────────────────────────────────────────
+
+▶ Tools available to this agent
+   • budget_breakdown
+   • get_weather
+   • search_guides_tool
+
+──────────────────────────────────────────────────────
+Previous queries this session:
+  ▶ Q: I have $900 for 6 days in Tokyo...
+       [answer hidden in expander]
 ```
 
 ---
 
-## Agent tab (tab3) replacement
+## Behavior requirements
 
-```python
-with tab3:
-    st.subheader("AI Travel Agent")
-    st.caption("The agent uses tools: budget calculation, live weather, and guide search.")
-
-    # Question input
-    question = st.text_area(
-        "Your question:",
-        placeholder="e.g. I have $1200 for 8 days in Tokyo. Check the weather and break down my budget.",
-        key="agent_question",
-    )
-
-    # Submit button
-    if st.button("Ask the Agent") and question.strip():
-        with st.spinner("Agent is working..."):
-            answer = run_agent(question)
-
-        st.markdown(answer)
-
-        # Show which tools are available
-        tool_names = [t["function"]["name"] for t in TOOL_DEFINITIONS]
-        with st.expander("Tools available to this agent"):
-            for name in tool_names:
-                st.write(f"• {name}")
-
-        # Save to history
-        st.session_state["agent_history"].append({
-            "question": question,
-            "answer": answer,
-        })
-
-    # Previous queries (all except the one just added, shown newest-first)
-    if st.session_state["agent_history"]:
-        previous = st.session_state["agent_history"][:-1] if question.strip() else st.session_state["agent_history"]
-        if previous:
-            st.divider()
-            st.caption("Previous queries this session:")
-            for item in reversed(previous):
-                label = item["question"][:60] + "..." if len(item["question"]) > 60 else item["question"]
-                with st.expander(f"Q: {label}"):
-                    st.write(item["answer"])
-```
+- Add `from src.tools import run_agent, TOOL_DEFINITIONS` to the imports (if not already present)
+- Use `st.text_area` (not `st.chat_input`) for the question input — agent questions are longer and benefit from a resizable box; give it a descriptive placeholder
+- "Ask the Agent" button: only runs if the text area is not empty
+  - Show a spinner with "Agent is working..." while `run_agent(question)` executes
+  - Display the returned answer as markdown
+  - Show a collapsible expander "Tools available to this agent" listing each tool name from `TOOL_DEFINITIONS`
+  - Append `{"question": question, "answer": answer}` to `st.session_state["agent_history"]`
+- Below the current result, show all previous queries from `"agent_history"` in reverse order (newest first), each as a collapsible expander with the question (truncated to ~60 chars) as the label and the answer as the body
 
 ---
 
-## Notes
+## Critical constraints
 
-- `run_agent()` prints `[Tool call]` and `[Tool result]` lines to the terminal where you ran `streamlit run`. These do not appear in the browser — that is expected.
-- `TOOL_DEFINITIONS` is the list of tool schemas defined in tools.py. We read the function names from it to show the user which tools the agent can call.
-- The agent tab uses a `st.text_area` (not `st.chat_input`) because agent questions are typically longer and benefit from a resizable box.
-- `st.button("Ask the Agent")` does not need a key because it is the only button in tab3.
-- Do not change tab1, tab2, or the sidebar section.
-- After saving, run `streamlit run src/app.py`, go to the Agent tab, and test with a compound question like: "I have $1500 for 10 days in Paris. Check the weather there and break down my budget." Watch the terminal for tool call output while the spinner is running in the browser.
+- `run_agent()` prints `[Tool call]` and `[Tool result]` lines to the terminal where `streamlit run` is running — these do NOT appear in the browser. Do not try to capture or display them in the UI.
+- Tool names come from `TOOL_DEFINITIONS` — read each entry's `"function"` → `"name"` field
+- `st.session_state["agent_history"]` stores dicts with `"question"` and `"answer"` keys — use these exact key names
+- Do not change the sidebar, tab1, or tab2 code

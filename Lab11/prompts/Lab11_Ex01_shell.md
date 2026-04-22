@@ -1,117 +1,66 @@
-Read src/models.py and src/storage.py first.
+Read src/models.py, src/storage.py, and src/ai_assistant.py first.
 
-Create src/app.py — a Streamlit web app for Trip Notes.
+Create src/app.py — a Streamlit web app for Trip Notes AI.
 
 ---
 
-## sys.path fix (required — add at the very top of the file)
+## Layout
 
-```python
-import sys
-import os
+```
+┌──────────────────────┬────────────────────────────────────────┐
+│  ✈️ Trip Notes AI    │  💬 Chat  │  🔍 Search  │  🤖 Agent   │
+│  ────────────────    │                                        │
+│  📍 Current trip     │                                        │
+│  [ Tokyo        ▼ ]  │     ℹ️  Coming soon — Exercise 2      │
+│                      │         (placeholder for each tab)     │
+│  📋 Notes (3)  [ ▼ ] │                                        │
+│   • Great ramen...   │                                        │
+│   • Train tip...     │                                        │
+│                      │                                        │
+│  [ Generate Briefing]│                                        │
+└──────────────────────┴────────────────────────────────────────┘
+```
+
+---
+
+## Behavior requirements
+
+**Page setup:**
+- Page title: "Trip Notes AI", page icon: ✈️, layout: wide
+- `st.set_page_config()` must be the first Streamlit call in the file
+
+**Session state (initialize once, before sidebar):**
+- `"trips"` → result of `load_trips()`
+- `"chat_history"` → empty list
+- `"search_history"` → empty list
+- `"agent_history"` → empty list
+
+**Sidebar:**
+- Title: "✈️ Trip Notes AI"
+- Selectbox labeled "📍 Current trip" — options are the names of all trips; if no trips, show `["(no trips yet)"]`
+- If the selected trip has notes: show a collapsible expander labeled `📋 Notes (N)` listing each note with a bullet
+- If the selected trip has no notes: show a small caption "No notes yet for this trip."
+- "Generate Briefing" button:
+  - If current trip has notes: call `ask()` with a briefing prompt that includes the trip name and its notes; display the result as markdown in the sidebar
+  - If no notes: show a warning "Add some notes first."
+
+**Main area:**
+- Three tabs: `💬 Chat`, `🔍 Search`, `🤖 Agent`
+- Each tab body: `st.info("Coming soon — Exercise 2")`, `st.info("Coming soon — Exercise 3")`, `st.info("Coming soon — Exercise 4")`
+
+---
+
+## Critical constraints
+
+**Data access:** `load_trips()` returns a `TripCollection` object — it is NOT directly iterable. Call `.get_all()` to get the list of `Destination` objects. All loops and list comprehensions over trips must use `.get_all()`.
+
+**sys.path fix:** Add these two lines at the very top of the file, before any imports:
+```
+import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ```
+This is required so that `from src.x import ...` resolves correctly when running `streamlit run src/app.py` from the `trip_notes/` directory.
 
-This ensures that `from src.ai_assistant import ...` resolves correctly when the file
-is run as `streamlit run src/app.py` from the trip_notes/ directory.
+**Imports needed:** `streamlit`, `load_trips` from `src.storage`, `ask` and `TRAVEL_SYSTEM_PROMPT` from `src.ai_assistant`. Do NOT import `rag_ask`, `run_agent`, or `ensure_index` yet.
 
----
-
-## Imports
-
-```python
-import streamlit as st
-from src.ai_assistant import ask, TRAVEL_SYSTEM_PROMPT
-from src.storage import load_trips
-```
-
-Do NOT import run_agent, rag_ask, or ensure_index yet — those come in later exercises.
-
----
-
-## Page config (must be the first Streamlit call)
-
-```python
-st.set_page_config(layout="wide", page_title="Trip Notes AI", page_icon="✈️")
-```
-
----
-
-## Session state initialization
-
-Place this block immediately after the imports and page config:
-
-```python
-if "trips" not in st.session_state:
-    st.session_state["trips"] = load_trips()
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
-if "search_history" not in st.session_state:
-    st.session_state["search_history"] = []
-if "agent_history" not in st.session_state:
-    st.session_state["agent_history"] = []
-```
-
----
-
-## Sidebar
-
-```python
-st.sidebar.title("✈️ Trip Notes AI")
-
-trips = st.session_state["trips"]
-trip_names = [t.name for t in trips] if trips else ["(no trips yet)"]
-selected_name = st.sidebar.selectbox("📍 Current trip", trip_names)
-current_trip = next((t for t in trips if t.name == selected_name), None)
-
-# Notes display
-if current_trip and current_trip.notes:
-    with st.sidebar.expander(f"📋 Notes ({len(current_trip.notes)})"):
-        for note in current_trip.notes:
-            st.write(f"• {note}")
-elif current_trip:
-    st.sidebar.caption("No notes yet for this trip.")
-
-# Briefing button
-if st.sidebar.button("Generate Briefing"):
-    if current_trip and current_trip.notes:
-        with st.sidebar.spinner("Generating..."):
-            notes_text = "\n".join(current_trip.notes)
-            briefing_prompt = (
-                f"Generate a concise travel briefing for {current_trip.name} "
-                f"based on these traveler notes:\n{notes_text}"
-            )
-            result = ask(briefing_prompt, system_prompt=TRAVEL_SYSTEM_PROMPT)
-        st.sidebar.markdown(result)
-    else:
-        st.sidebar.warning("Add some notes first.")
-```
-
----
-
-## Main area — three tabs
-
-```python
-tab1, tab2, tab3 = st.tabs(["💬 Chat", "🔍 Search", "🤖 Agent"])
-
-with tab1:
-    # Ex2: Chat tab will go here
-    st.info("Coming soon — Exercise 2")
-
-with tab2:
-    # Ex3: Search tab will go here
-    st.info("Coming soon — Exercise 3")
-
-with tab3:
-    # Ex4: Agent tab will go here
-    st.info("Coming soon — Exercise 4")
-```
-
----
-
-## Notes
-
-- Do not add any custom CSS or HTML.
-- Do not import or reference run_agent or rag_ask in this file yet.
-- The file should run cleanly with `streamlit run src/app.py` from the trip_notes/ directory.
-- If load_trips() returns an empty list, the selectbox should show "(no trips yet)" and the briefing button should show the warning message.
+**Run command** (from `trip_notes/`): `streamlit run src/app.py`
