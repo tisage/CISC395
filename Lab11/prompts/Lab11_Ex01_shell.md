@@ -37,6 +37,7 @@ Create src/app.py — a Streamlit web app for Trip Notes AI.
 
 **Sidebar:**
 - Title: "✈️ Trip Notes AI"
+- Subtitle caption: "Powered by Atlas, your travel AI" (use `st.sidebar.caption()`)
 - Selectbox labeled "📍 Current trip" — options are the names of all trips; if no trips, show `["(no trips yet)"]`
 - If the selected trip has notes: show a collapsible expander labeled `📋 Notes (N)` listing each note with a bullet
 - If the selected trip has no notes: show a small caption "No notes yet for this trip."
@@ -61,6 +62,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ```
 This is required so that `from src.x import ...` resolves correctly when running `streamlit run src/app.py` from the `trip_notes/` directory.
 
-**Imports needed:** `streamlit`, `load_trips` from `src.storage`, `ask` and `TRAVEL_SYSTEM_PROMPT` from `src.ai_assistant`. Do NOT import `rag_ask`, `run_agent`, or `ensure_index` yet.
+**Imports needed:** `streamlit`, `load_trips` from `src.storage`, `ask`, `TRAVEL_SYSTEM_PROMPT`, and `client` from `src.ai_assistant`. Do NOT import `rag_ask`, `run_agent`, or `ensure_index` yet.
 
 **Run command** (from `trip_notes/`): `streamlit run src/app.py`
+
+**Note on terminal warnings:** You may see a `ModuleNotFoundError: No module named 'torchvision'` message in the terminal when starting the app. This is a harmless warning from the `transformers` library (installed as part of Lab 09) and does not affect functionality. If the browser opens, the app is working correctly — ignore the warning.
